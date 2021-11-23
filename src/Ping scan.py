@@ -8,7 +8,7 @@ import time
 
 start_time = time.time()
 
-#This function takes the initial string (input) and discards all the spaces , so we can make our job easier and more predictable.
+#This function takes the initial string (input) and discards all the spaces , so we can make our job easier and more predictable!
 def noSpaceString(ip_range):
     renewed_range = []
     for char in range(len(ip_range)):
