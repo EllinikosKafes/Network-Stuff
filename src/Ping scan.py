@@ -55,14 +55,14 @@ def get_octets(ip_range):
 
 #In this function , we get the prefix length (e.g. /24) or the end address , which is the last octet that the user has put (e.g. -245) , depending on the method.
 
-def get_prefix_or_end_address(ip_range, method):
-    length = len(ip_range)
+def get_prefix_or_end_address(ip_string, method):
+    length = len(ip_string)
     if method == '1':
-        x = ip_range.index('/')
+        x = ip_string.index('/')
     else:
-        x = ip_range.index('-')
+        x = ip_string.index('-')
 
-    return int(ip_range[x + 1: length])
+    return int(ip_string[x + 1: length])
 
 
 #This is the function that checks for user input errors. We check if he has put an invalid character, if he did not put a prefix length, if his octets exceed
@@ -310,8 +310,8 @@ print("[ACTIVE HOSTS]\n")
 
 bubble_sort()
 
-for i in range(0, len(active_ips)):
-    print(active_ips[i])
+for ip in active_ips:
+    print(ip)
 
 print('\n', len(active_ips), "active host(s) detected out of", count)
 print("--- %s seconds ---" % (time.time() - start_time))
