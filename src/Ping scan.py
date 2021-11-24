@@ -1,4 +1,4 @@
-#The following script is a ping scan that allows us to detect "alive" devices or hosts in our network .
+#The following script is a ping scan that allows us to detect "alive" devices or hosts in our network.
 #Currently it only supports for a scan of max 256 hosts (/24 or 0-255) for ease and faster execution time (Warning : it's slow).
 #It is currently supported only for Windows , some modifications have to happen to be supported in other OS.
 
@@ -6,7 +6,6 @@ import subprocess
 import threading
 import time
 
-start_time = time.time()
 
 #This function takes the initial string (input) and discards all the spaces , so we can make our job easier and more predictable!
 def noSpaceString(ip_range):
@@ -54,7 +53,7 @@ def get_octets(ip_range):
     return octets
 
 
-# Σε αυτή την συνάρτηση εξάγουμε το prefix length που μας έδωσε ο χρήστης . Παίρνωντας το ip range (ip_range) ως όρισμα , βρίσκουμε το prefix .
+#In this function , we get the prefix length (e.g. /24) or the end address , which is the last octet that the user has put (e.g. -245) , depending on the method.
 
 def get_prefix_or_end_address(ip_range, method):
     length = len(ip_range)
@@ -66,11 +65,10 @@ def get_prefix_or_end_address(ip_range, method):
     return int(ip_range[x + 1: length])
 
 
-# Συνάρτηση για τον έλεγχο λαθών χρήστη . Ελέγχουμε άμα έβαλε κάποιον άκυρο χαρακτήρα , άμα δεν έβαλε prefix length , άμα τα octets του ξεπερνάνε τα
-# -επιτρεπόμενα όρια , άμα το prefix length που έβαλε είναι μεγαλύτερο του 32 ή μικρότερο του 24 και άμα ο γενικός πληθυσμός των χαρακτήρων είναι περι-
-# -σσότεροι ή λιγότεροι από τι περιμένουμε .
-# Για τώρα , δεν το έχω προγραμματίσει να υποστηρίζει prefixes μικρότερα από 24 για λόγους απλότητας και ευκολίας (δηλ. πρέπει να ελέγξουμε και να
-# επεξεργάσουμε μόνο το τελευταίο octet) , και για να το τεστάρω στο LAN μου .
+#This is the function that checks for user input errors. We check if he has put an invalid character, if he did not put a prefix length, if his octets exceed
+#the allowed limits, if the prefix length entered is greater than 32 or less than 24 and if the general character population is more or less than we expect.
+#For now, I have not programmed it to support prefixes less than 24 for reasons of simplicity and convenience (because we need to check and
+#process only the last octet).
 
 def check_for_errors():
     global prefix
@@ -93,6 +91,7 @@ def check_for_errors():
         print("Not supported , Please try again ....")
         return False
 
+    #Determine which method is being used .
     if '-' in ip_range:
         method = '2'
     elif '/' in ip_range:
@@ -129,7 +128,7 @@ def check_for_errors():
             return False
 
         if end_address > 255 or end_address < 0:
-            print("The end address is exceeding the limits , Please try again ...\n")
+            print("The end address is exceeding the limits of an IPv4 address , Please try again ...\n")
             return False
 
     return True
@@ -138,7 +137,7 @@ def check_for_errors():
 def init_process():
     global ip_range
 
-    #Getting the input string of the user , which is the ip range that he wishes to scan .
+    #Getting the input string of the user , which is the IPv4 range that he wishes to scan .
     ip_range = str(
         input("Type the IPv4 address range that you wish to scan following these two methods : ( 192.168.1.0/24 )   "
               "or   ( 192.168.1.0-255 )    :"))
@@ -157,8 +156,11 @@ def scanning_process(first_address , last_address):
 
     for j in range(first_address , last_address):
 
-        #if we exceed the limits of the last octet , abort .
+        #if we exceed the limits of the last octet , abort.
         if j > 255 :
+            break
+        #if we pass the end address , abort.
+        elif method == '2' and j > end_address:
             break
 
         #The current address to be scanned.
@@ -181,33 +183,37 @@ def scanning_process(first_address , last_address):
             print("Ping to " + address, "failed!")
 
 
-# Συνάρτηση για να ταξινομήσουμε την λίστα των ενεργών host από την λίστα active_ips . Μερικά threads/processes τελειώνουν πιο γρήγορα από
-# τις προηγούμενες τους , γι'αυτό πρέπει να ταξινόμησουμε την λίστα . Αυτή η συνάρτηση είναι προαιρετική .
+#Function to sort the list of active hosts from the active_ips list.
+#Some processes end faster than their predecessors, so we need to sort the list. This function is optional.
+
 def bubble_sort():
+
     global active_ips
     last_octets = []
-
-    for ip in range(len(active_ips)):
-        temp_string = active_ips[ip]
-        ind3 = temp_string.rindex('.')
-        oct4 = temp_string[ind3 + 1: len(temp_string)]
+    #In this loop we append every last octet of the active IPv4 adresses in the last_octets list.
+    #I did this in order to compare the active IPv4 addresses by using their last octets (that are simple integers).
+    #So in this case , we will have 2 parallel lists , one with the last octet of the IPv4 address(integer) and one with the actual IPv4 address(string).
+    for ip in active_ips:
+        temp_string = ip
+        last_dot_index = temp_string.rindex('.')
+        oct4 = temp_string[last_dot_index + 1: len(temp_string)]
         last_octets.append(int(oct4))
 
-    for i in range(len(active_ips)):
+    for i in range (len(active_ips)):
 
-        for j in range(0, len(active_ips) - i - 1):
+        for j in range ( 0 , len(active_ips) - i - 1):
 
             if last_octets[j] > last_octets[j + 1]:
 
-                holder = last_octets[j]
+                holder_variable = last_octets[j]
                 last_octets[j] = last_octets[j + 1]
-                last_octets[j + 1] = holder
-                holder = active_ips[j]
+                last_octets[j + 1] = holder_variable
+                holder_variable = active_ips[j]
                 active_ips[j] = active_ips[j + 1]
-                active_ips[j + 1] = holder
+                active_ips[j + 1] = holder_variable
 
 
-#Method '1' is the prefix method (i.e. 192,168.1.0/24) , while method '2' is the range method (i.e. 192,168.1.0 - 255)
+#Method '1' is the prefix method (e.g. 192,168.1.0/24) , while method '2' is the range method (e.g. 192.168.1.0 - 255)
 
 method = ''
 ip_range = ''
@@ -223,6 +229,7 @@ init_process()
 while check_for_errors() == False:
     init_process()
 
+start_time = time.time()
 
 
 if method == '1':
@@ -262,13 +269,13 @@ finish = start + increment
 
 if count < 8 :
 
+    # print("Increment:", increment)
+
     for i in range(count):
 
-        print("Start:", start)
+        #print("Start:", start)
 
-        print("Increment:", increment)
-
-        print("Telos:", finish)
+        #print("End:", finish)
 
         t = threading.Thread(target=scanning_process, args=(start, finish,))
         t.start()
@@ -283,13 +290,8 @@ if count < 8 :
 
 else:
 
+
     for i in range(8):
-
-        print("Start:",start)
-
-        print("Increment:",increment)
-
-        print("Telos:",finish)
 
         t = threading.Thread(target=scanning_process , args=(start,finish,))
         t.start()
