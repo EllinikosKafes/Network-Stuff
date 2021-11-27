@@ -10,11 +10,13 @@ import time
 # This function takes the initial string (input) and discards all the spaces , so we can make our job easier and more predictable!
 def noSpaceString(ip_range):
     renewed_range = []
-    for char in range(len(ip_range)):
-        if ip_range[char] == ' ':
+    for char in ip_range:
+
+        if char == ' ':
             pass
         else:
-            renewed_range.append(ip_range[char])
+            renewed_range.append(char)
+            
     return ''.join(renewed_range)
 
 
@@ -386,7 +388,7 @@ else:
     else:
 
         for i in range(32):
-            
+
             t = threading.Thread(target=scanning_process, args=(start, finish,))
             t.start()
             threads.append(t)
