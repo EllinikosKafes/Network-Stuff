@@ -16,7 +16,7 @@ def noSpaceString(ip_range):
             pass
         else:
             renewed_range.append(char)
-            
+
     return ''.join(renewed_range)
 
 
@@ -275,6 +275,7 @@ elif method == '2':
 else:
     count = 0
 
+
 print("Scanning ", count, "host(s).\n")
 
 if int(speed) == 1:
@@ -289,7 +290,7 @@ if int(speed) == 1:
 elif int(speed) == 2:
     if count < 16:
         increment = 1
-    elif count % 8 == 0:
+    elif count % 16 == 0:
         increment = int(count / 16)
     else:
         increment = int(count / 16) + 1
@@ -297,7 +298,7 @@ elif int(speed) == 2:
 else:
     if count < 32:
         increment = 1
-    elif count % 8 == 0:
+    elif count % 32 == 0:
         increment = int(count / 32)
     else:
         increment = int(count / 32) + 1
@@ -311,7 +312,6 @@ finish = start + increment
 if int(speed) == 1:
 
     if count < 8:
-        # print("Increment:", increment)
 
         for i in range(count):
             # print("Start:", start)
@@ -343,7 +343,6 @@ if int(speed) == 1:
 elif int(speed) == 2:
 
     if count < 16:
-        # print("Increment:", increment)
 
         for i in range(count):
             # print("Start:", start)
@@ -373,10 +372,8 @@ elif int(speed) == 2:
 else:
 
     if count < 32:
-        # print("Increment:", increment)
 
         for i in range(count):
-
 
             t = threading.Thread(target=scanning_process, args=(start, finish,))
             t.start()
