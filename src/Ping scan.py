@@ -5,8 +5,6 @@ def noSpaceString(ip_range):
     return ip_range.replace(' ', '')
 
 
-# Function to store all the indexes of the dots. (We do this so we can isolate octets with confidence)
-# Save each index to index_list and return its elements. We execute this function in the get_octets function .
 def get_indexes(ip_range, method):
     index_list = []
     
@@ -14,8 +12,7 @@ def get_indexes(ip_range, method):
         if ip_range[i] == ".":
             index_list.append(i)
 
-    # The slash character is for method '1' and the dash character is for method '2'.
-
+    # get method
     if method == '1':
         index_list.append(ip_range.index('/'))
     else:
@@ -115,11 +112,12 @@ def check_for_errors(ip_range, speed):
 
 
 def init_process():
+    print("\n\n[PING SCAN[\n\n")
+    
     ip_range = input("Type the IPv4 address range that you wish to scan following these two methods : ( 192.168.1.0/24 )   "
               "or   ( 192.168.1.0-255 )    : ")
 
-    # We remove all the spaces added by the user by mistake, in order to make the job easier (because of the indexes)
-    # and more predictable.
+    # remove all spaces of the ip_range string
     ip_range = noSpaceString(ip_range)
     speed = input("Choose speed ( 1 , 2 , 3 ): ")
 
@@ -192,10 +190,7 @@ ip_range = ''
 speed = 0
 prefix = -1
 end_address = -1
-octets = []
-active_ips = []
-threads = []
-print("\n\n[PING SCAN]\n\n")
+octets = active_ips = threads = []
 
 ip_range,speed = init_process()
 while check_for_errors(ip_range , speed) == False:
@@ -211,8 +206,6 @@ if method == '1':
         count = 256 - octets[3]
     else:
         count = pow(2, 32 - prefix)
-
-
 elif method == '2':
     if end_address > octets[3]:
         count = end_address - octets[3] + 1
@@ -220,7 +213,6 @@ elif method == '2':
         count = octets[3] - end_address
     else:
         count = 1
-
 else:
     count = 0
 
@@ -234,8 +226,6 @@ if int(speed) == 1:
         increment = int(count / 8)
     else:
         increment = int(count / 8) + 1
-
-
 elif int(speed) == 2:
     if count < 16:
         increment = 1
@@ -243,7 +233,6 @@ elif int(speed) == 2:
         increment = int(count / 16)
     else:
         increment = int(count / 16) + 1
-
 else:
     if count < 32:
         increment = 1
