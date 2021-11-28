@@ -119,15 +119,10 @@ def scanning_process(first_address, last_address):
         address = str(octets[0]) + "." + str(octets[1]) + "." + str(octets[2]) + "." + str(j)
         res = subprocess.run(["ping", address, "-n", '3', ], capture_output=True, text=True, shell=True)
 
-        if res.returncode == 0 and (res.stdout.count("Destination host unreachable")) > 1:
-            print(address, "is unreachable!")
-        elif res.returncode == 0 and (res.stdout.count("Destination net unreachable")) > 1:
-            print("The network of ", address, "is unreachable!")
-        elif res.returncode == 0:
+        if res.returncode == 0 and not ((res.stdout.count("Destination host unreachable")) > 1) and not (
+                (res.stdout.count("Destination net unreachable")) > 1):
             print(address, "is responsive!")
             active_ips.append(address)
-        else:
-            print("Ping to " + address, "failed!")
 
 
 def startThreads(totalThreads, start, finish):
