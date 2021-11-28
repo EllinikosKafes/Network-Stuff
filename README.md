@@ -1,6 +1,6 @@
 # Network-Stuff
 
-This repository is meant for networking tools written in python 3. As of now, there is only one tool available and that tool is [Ping Scan.py](https://github.com/EllinikosKafes/Network-Stuff/blob/main/src/Ping%20scan.py), more will soon be added !
+This repository is meant for networking tools written in python 3. As of now, there is only one tool available and that tool is [Ping Scan.py](https://github.com/EllinikosKafes/Network-Stuff/blob/main/src/Ping%20scan.py) (a C version of the program will soon be available), more will soon be added !
 
 <br>
 
