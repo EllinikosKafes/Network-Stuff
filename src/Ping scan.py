@@ -153,6 +153,19 @@ def scanning_process(first_address, last_address ):
             print("Ping to " + address, "failed!")
 
 
+def startThreads(totalThreads, start, finish):
+    for i in range(totalThreads):
+        t = threading.Thread(target=scanning_process, args=(start, finish,))
+        t.start()
+        threads.append(t)
+
+        start = finish
+        finish += increment
+
+    for thread in threads:
+        thread.join()
+
+
 # Sort the active hosts in ascending order
 def bubble_sort(active_ips):
     last_octets = []
@@ -242,40 +255,16 @@ else:
 
 start = octets[3]
 finish = start + increment
+totalThreads = 0;
 
 
 if int(speed) == 1:
-    if count < 8:
-        for i in range(8):
-            t = threading.Thread(target=scanning_process, args=(start, finish,))
-            t.start()
-            threads.append(t)
-
-            start = finish
-            finish += increment
-            
+    startThreads(8, start, finish)
 elif int(speed) == 2:
-        for i in range(16):
-            t = threading.Thread(target=scanning_process, args=(start, finish,))
-            t.start()
-            threads.append(t)
-
-            start = finish
-            finish += increment
-            
+    startThreads(16, start, finish)
 else:
-        for i in range(32):
-            t = threading.Thread(target=scanning_process, args=(start, finish,))
-            t.start()
-            threads.append(t)
+    startThreads(32, start, finish)
 
-            start = finish
-            finish += increment
-
-
-
-for thread in threads:
-    thread.join()
 
 print("\n\n\n\n[ACTIVE HOSTS]\n")
 
