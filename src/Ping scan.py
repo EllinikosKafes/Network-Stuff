@@ -7,7 +7,7 @@ def noSpaceString(ip_range):
 
 def get_indexes(ip_range, method):
     index_list = []
-    
+
     for i in range(len(ip_range)):
         if ip_range[i] == ".":
             index_list.append(i)
@@ -37,10 +37,10 @@ def get_octets(ip_range, method):
 
 def get_prefix_or_end_address(ip_string, method):
     length = len(ip_string)
-    
+
     if method == '1':
         return int(ip_string[ip_string.index('/') + 1: length])
-    
+
     return int(ip_string[ip_string.index('-') + 1: length])
 
 
@@ -84,7 +84,6 @@ def check_for_errors(ip_range, speed):
     # Exporting the 4 octets as integers in a list.
     octets = get_octets(ip_range, method)
 
-
     if method == '1':
         prefix = get_prefix_or_end_address(ip_range, method)
     else:
@@ -107,15 +106,15 @@ def check_for_errors(ip_range, speed):
             print("The end address is exceeding the limits of an IPv4 address , Please try again ...\n")
             return False
 
-
-    return method , octets , prefix , end_address
+    return method, octets, prefix, end_address
 
 
 def init_process():
-    print("\n\n[PING SCAN[\n\n")
-    
-    ip_range = input("Type the IPv4 address range that you wish to scan following these two methods : ( 192.168.1.0/24 )   "
-              "or   ( 192.168.1.0-255 )    : ")
+    print("\n\n[PING SCAN]\n\n")
+
+    ip_range = input(
+        "Type the IPv4 address range that you wish to scan following these two methods : ( 192.168.1.0/24 )   "
+        "or   ( 192.168.1.0-255 )    : ")
 
     # remove all spaces of the ip_range string
     ip_range = noSpaceString(ip_range)
@@ -125,7 +124,7 @@ def init_process():
 
 
 # This function is what actually finds if a host is active or not with the ping command
-def scanning_process(first_address, last_address ):
+def scanning_process(first_address, last_address):
     global active_ips
 
     for j in range(first_address, last_address):
@@ -152,11 +151,11 @@ def scanning_process(first_address, last_address ):
 
 
 def startThreads(totalThreads, start, finish):
+    threads = []
     for i in range(totalThreads):
         t = threading.Thread(target=scanning_process, args=(start, finish,))
         t.start()
         threads.append(t)
-
         start = finish
         finish += increment
 
@@ -178,7 +177,7 @@ def bubble_sort(active_ips):
         for j in range(0, len(active_ips) - i - 1):
             if last_octets[j] > last_octets[j + 1]:
                 last_octets[j], last_octets[j + 1] = last_octets[j + 1], last_octets[j]
-                active_ips[j], active_ips[j + 1] = active_ips[j + 1], active_ips[j]                
+                active_ips[j], active_ips[j + 1] = active_ips[j + 1], active_ips[j]
 
     return active_ips
 
@@ -190,14 +189,13 @@ ip_range = ''
 speed = 0
 prefix = -1
 end_address = -1
-octets = active_ips = threads = []
+octets = active_ips = []
 
-ip_range,speed = init_process()
-while check_for_errors(ip_range , speed) == False:
+ip_range, speed = init_process()
+while check_for_errors(ip_range, speed) == False:
     ip_range, speed = init_process()
 
-method , octets , prefix , end_address = check_for_errors(ip_range , speed)
-
+method, octets, prefix, end_address = check_for_errors(ip_range, speed)
 
 start_time = time.time()
 
@@ -215,7 +213,6 @@ elif method == '2':
         count = 1
 else:
     count = 0
-
 
 print("Scanning ", count, "host(s).\n")
 
@@ -241,19 +238,25 @@ else:
     else:
         increment = int(count / 32) + 1
 
-
 start = octets[3]
 finish = start + increment
 totalThreads = 0;
 
-
 if int(speed) == 1:
-    startThreads(8, start, finish)
+    if count < 8:
+        startThreads(count, start, finish)
+    else:
+        startThreads(8, start, finish)
 elif int(speed) == 2:
-    startThreads(16, start, finish)
+    if count < 16:
+        startThreads(count, start, finish)
+    else:
+        startThreads(16, start, finish)
 else:
-    startThreads(32, start, finish)
-
+    if count < 32:
+        startThreads(count, start, finish)
+    else:
+        startThreads(32, start, finish)
 
 print("\n\n\n\n[ACTIVE HOSTS]\n")
 
