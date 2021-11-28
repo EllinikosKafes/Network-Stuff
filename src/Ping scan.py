@@ -10,11 +10,9 @@ import time
 # This function takes the initial string (input) and discards all the spaces , so we can make our job easier and more predictable!
 def noSpaceString(ip_range):
     renewed_range = []
+    
     for char in ip_range:
-
-        if char == ' ':
-            pass
-        else:
+        if char != ' ':
             renewed_range.append(char)
 
     return ''.join(renewed_range)
@@ -62,6 +60,7 @@ def get_octets(ip_range, method):
 
 def get_prefix_or_end_address(ip_string, method):
     length = len(ip_string)
+    
     if method == '1':
         x = ip_string.index('/')
     else:
@@ -131,13 +130,11 @@ def check_for_errors(ip_range, speed):
             return False
 
     if method == '1':
-
         if prefix < 24 or prefix > 32:
             print("The specified prefix length is incorrect or not supported , Please try again ....\n")
             return False
 
     if method == '2':
-
         if octets[3] > end_address:
             print("Invalid syntax , Please try again ...\n")
             return False
@@ -152,8 +149,6 @@ def check_for_errors(ip_range, speed):
 
 
 def init_process():
-
-    # Getting the input string of the user , which is the IPv4 range that he wishes to scan .
     ip_range = str(
         input("Type the IPv4 address range that you wish to scan following these two methods : ( 192.168.1.0/24 )   "
               "or   ( 192.168.1.0-255 )    :"))
@@ -310,14 +305,8 @@ finish = start + increment
 
 
 if int(speed) == 1:
-
     if count < 8:
-
         for i in range(count):
-            # print("Start:", start)
-
-            # print("End:", finish)
-
             t = threading.Thread(target=scanning_process, args=(start, finish,))
             t.start()
             threads.append(t)
@@ -326,7 +315,6 @@ if int(speed) == 1:
             finish += increment
 
     else:
-
         for i in range(8):
             t = threading.Thread(target=scanning_process, args=(start, finish,))
             t.start()
@@ -334,30 +322,17 @@ if int(speed) == 1:
 
             start = finish
             finish += increment
-
-
-
-
-
-
+            
 elif int(speed) == 2:
-
     if count < 16:
-
         for i in range(count):
-            # print("Start:", start)
-
-            # print("End:", finish)
-
             t = threading.Thread(target=scanning_process, args=(start, finish,))
             t.start()
             threads.append(t)
 
             start = finish
             finish += increment
-
     else:
-
         for i in range(16):
             t = threading.Thread(target=scanning_process, args=(start, finish,))
             t.start()
@@ -365,27 +340,18 @@ elif int(speed) == 2:
 
             start = finish
             finish += increment
-
-
-
-
+            
 else:
-
     if count < 32:
-
         for i in range(count):
-
             t = threading.Thread(target=scanning_process, args=(start, finish,))
             t.start()
             threads.append(t)
 
             start = finish
             finish += increment
-
     else:
-
         for i in range(32):
-
             t = threading.Thread(target=scanning_process, args=(start, finish,))
             t.start()
             threads.append(t)
@@ -398,8 +364,7 @@ else:
 for thread in threads:
     thread.join()
 
-print("\n\n\n\n")
-print("[ACTIVE HOSTS]\n")
+print("\n\n\n\n[ACTIVE HOSTS]\n")
 
 active_ips = bubble_sort(active_ips)
 
