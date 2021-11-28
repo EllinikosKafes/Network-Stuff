@@ -47,6 +47,12 @@ def check_for_errors(ip_range, speed):
     valid_values = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '/', '.', '-']
     prefix = end_address = -1
 
+    try:
+        speed = int(speed)
+    except ValueError:
+        print("This is not a supported speed , Please try again...")
+        return False
+
     if speed not in [1, 2, 3]:
         print("This is not a supported speed , Please try again...")
         return False
@@ -59,7 +65,7 @@ def check_for_errors(ip_range, speed):
     if len(ip_range) > 18 or len(ip_range) < 9:
         print("More characters typed than expected , Please try again ....\n")
         return False
-    elif '-' and '/' not in ip_range:
+    if ('-' in ip_range and '/' in ip_range) or ('-' not in ip_range and '/' not in ip_range):
         print("Not supported , Please try again ....")
         return False
 
@@ -164,12 +170,13 @@ octets = active_ips = []
 speed = 0
 
 print("\n\n[PING SCAN]\n\n")
-ip_range = noSpaceString(input("Type the IPv4 address range that you wish to scan following these two methods \n( 192.168.1.0/24  or   ( 192.168.1.0-255 )    : "))
+ip_range = noSpaceString(input("Type the IPv4 address range that you wish to scan following these two methods \n( 192.168.1.0/24)  or   ( 192.168.1.0-255 )    : "))
 speed = int(input("Choose speed ( 1 , 2 , 3 ): "))
 
 while not check_for_errors(ip_range, speed):
-    ip_range = noSpaceString(input("Type the IPv4 address range that you wish to scan following these two methods \n( 192.168.1.0/24  or   ( 192.168.1.0-255 )    : "))
+    ip_range = noSpaceString(input("Type the IPv4 address range that you wish to scan following these two methods \n( 192.168.1.0/24)  or   ( 192.168.1.0-255 )    : "))
     speed = int(input("Choose speed ( 1 , 2 , 3 ): "))
+
 
 method, octets, prefix, end_address = check_for_errors(ip_range, speed)
 start_time = time.time()
