@@ -119,8 +119,15 @@ def scanning_process(first_address, last_address):
         address = str(octets[0]) + "." + str(octets[1]) + "." + str(octets[2]) + "." + str(j)
         res = subprocess.run(["ping", address, "-n", '3', ], capture_output=True, text=True, shell=True)
 
-        if res.returncode == 0:
+        if res.returncode == 0 and (res.stdout.count("Destination host unreachable")) > 1:
+            print(address, "is unreachable!")
+        elif res.returncode == 0 and (res.stdout.count("Destination net unreachable")) > 1:
+            print("The network of ", address, "is unreachable!")
+        elif res.returncode == 0:
+            print(address, "is responsive!")
             active_ips.append(address)
+        else:
+            print("Ping to " + address, "failed!")
 
 
 def startThreads(totalThreads, start, finish):
@@ -164,11 +171,11 @@ speed = 0
 
 print("\n\n[PING SCAN]\n\n")
 ip_range = noSpaceString(input("Type the IPv4 address range that you wish to scan following these two methods \n( 192.168.1.0/24)  or   ( 192.168.1.0-255 )    : "))
-speed = int(input("Choose speed ( 1 , 2 , 3 ): "))
+speed = input("Choose speed ( 1 , 2 , 3 ): ")
 
 while not check_for_errors(ip_range, speed):
     ip_range = noSpaceString(input("Type the IPv4 address range that you wish to scan following these two methods \n( 192.168.1.0/24)  or   ( 192.168.1.0-255 )    : "))
-    speed = int(input("Choose speed ( 1 , 2 , 3 ): "))
+    speed = input("Choose speed ( 1 , 2 , 3 ): ")
 
 
 method, octets, prefix, end_address = check_for_errors(ip_range, speed)
