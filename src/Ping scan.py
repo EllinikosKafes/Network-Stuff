@@ -25,12 +25,10 @@ def get_octets(ip_range, method):
     octets = []
     ind1, ind2, ind3, index_of_slash_or_dash = get_indexes(ip_range, method)
 
-    oct1 = int(ip_range[0: ind1])
-    oct2 = int(ip_range[ind1 + 1: ind2])
-    oct3 = int(ip_range[ind2 + 1: ind3])
-    oct4 = int(ip_range[ind3 + 1: index_of_slash_or_dash])
-
-    octets.extend([oct1, oct2, oct3, oct4])
+    octets.append(int(ip_range[0: ind1]))
+    octets.append(int(ip_range[ind1 + 1: ind2]))
+    octets.append(int(ip_range[ind2 + 1: ind3]))
+    octets.append(int(ip_range[ind3 + 1: index_of_slash_or_dash]))
 
     return octets
 
@@ -47,8 +45,7 @@ def get_prefix_or_end_address(ip_string, method):
 # This function checks for input errors, it only checks for invalid characters, missing prefix length, allowed limits, prefix length limits
 def check_for_errors(ip_range, speed):
     valid_values = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '/', '.', '-']
-    prefix = -1
-    end_address = -1
+    prefix = end_address = -1
 
     try:
         speed = int(speed)
@@ -68,7 +65,7 @@ def check_for_errors(ip_range, speed):
     if len(ip_range) > 18 or len(ip_range) < 9:
         print("More characters typed than expected , Please try again ....\n")
         return False
-    elif '-' in ip_range and '/' in ip_range:
+    elif '-' and '/' in ip_range:
         print("Not supported , Please try again ....")
         return False
 
@@ -116,11 +113,9 @@ def init_process():
         "Type the IPv4 address range that you wish to scan following these two methods : ( 192.168.1.0/24 )   "
         "or   ( 192.168.1.0-255 )    : ")
 
-    # remove all spaces of the ip_range string
-    ip_range = noSpaceString(ip_range)
     speed = input("Choose speed ( 1 , 2 , 3 ): ")
 
-    return ip_range, speed
+    return noSpaceString(ip_range), speed
 
 
 # This function is what actually finds if a host is active or not with the ping command
@@ -137,7 +132,7 @@ def scanning_process(first_address, last_address):
 
         # Check active hosts with the ping command
         address = str(octets[0]) + "." + str(octets[1]) + "." + str(octets[2]) + "." + str(j)
-        res = subprocess.run(["ping", address, "-n", '3', ], capture_output=True, text=True , shell=True)
+        res = subprocess.run(["ping", address, "-n", '3', ], capture_output=True, text=True, shell=True)
 
         if res.returncode == 0 and (res.stdout.count("Destination host unreachable")) > 1:
             print(address, "is unreachable!")
@@ -152,6 +147,7 @@ def scanning_process(first_address, last_address):
 
 def startThreads(totalThreads, start, finish):
     threads = []
+    
     for i in range(totalThreads):
         t = threading.Thread(target=scanning_process, args=(start, finish,))
         t.start()
@@ -168,8 +164,7 @@ def bubble_sort(active_ips):
     last_octets = []
 
     for ip in active_ips:
-        temp_string = ip
-        last_dot_index = temp_string.rindex('.')
+        last_dot_index = ip.rindex('.')
         oct4 = temp_string[last_dot_index + 1: len(temp_string)]
         last_octets.append(int(oct4))
 
@@ -184,15 +179,13 @@ def bubble_sort(active_ips):
 
 # Method '1' is the prefix method (e.g. 192,168.1.0/24) , while method '2' is the range method (e.g. 192.168.1.0 - 255)
 
-method = ''
-ip_range = ''
-speed = 0
-prefix = -1
-end_address = -1
+prefix = end_address = -1
+method = ip_range = ''
 octets = active_ips = []
+speed = 0
 
 ip_range, speed = init_process()
-while check_for_errors(ip_range, speed) == False:
+while not check_for_errors(ip_range, speed):
     ip_range, speed = init_process()
 
 method, octets, prefix, end_address = check_for_errors(ip_range, speed)
