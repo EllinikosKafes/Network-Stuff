@@ -2,13 +2,7 @@ import subprocess, threading, time
 
 
 def noSpaceString(ip_range):
-    renewed_range = []
-    
-    for char in ip_range:
-        if char != ' ':
-            renewed_range.append(char)
-
-    return ''.join(renewed_range)
+    return ip_range.replace(' ', '')
 
 
 # Function to store all the indexes of the dots. (We do this so we can isolate octets with confidence)
@@ -48,11 +42,9 @@ def get_prefix_or_end_address(ip_string, method):
     length = len(ip_string)
     
     if method == '1':
-        x = ip_string.index('/')
-    else:
-        x = ip_string.index('-')
-
-    return int(ip_string[x + 1: length])
+        return int(ip_string[ip_string.index('/') + 1: length])
+    
+    return int(ip_string[ip_string.index('-') + 1: length])
 
 
 # This function checks for input errors, it only checks for invalid characters, missing prefix length, allowed limits, prefix length limits
@@ -67,7 +59,7 @@ def check_for_errors(ip_range, speed):
         print("This is not a supported speed , Please try again...")
         return False
 
-    if speed != 1 and speed != 2 and speed != 3:
+    if speed not in [1, 2, 3]:
         print("This is not a supported speed , Please try again...")
         return False
 
@@ -110,27 +102,26 @@ def check_for_errors(ip_range, speed):
         if prefix < 24 or prefix > 32:
             print("The specified prefix length is incorrect or not supported , Please try again ....\n")
             return False
-
-    if method == '2':
+    elif method == '2':
         if octets[3] > end_address:
             print("Invalid syntax , Please try again ...\n")
             return False
-
-        if end_address > 255 or end_address < 0:
+        elif end_address > 255 or end_address < 0:
             print("The end address is exceeding the limits of an IPv4 address , Please try again ...\n")
             return False
+
 
     return method , octets , prefix , end_address
 
 
 def init_process():
     ip_range = input("Type the IPv4 address range that you wish to scan following these two methods : ( 192.168.1.0/24 )   "
-              "or   ( 192.168.1.0-255 )    :")
+              "or   ( 192.168.1.0-255 )    : ")
 
     # We remove all the spaces added by the user by mistake, in order to make the job easier (because of the indexes)
     # and more predictable.
     ip_range = noSpaceString(ip_range)
-    speed = input("Choose speed ( 1 , 2 , 3 ):")
+    speed = input("Choose speed ( 1 , 2 , 3 ): ")
 
     return ip_range, speed
 
