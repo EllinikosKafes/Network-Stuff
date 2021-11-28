@@ -47,12 +47,6 @@ def check_for_errors(ip_range, speed):
     valid_values = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '/', '.', '-']
     prefix = end_address = -1
 
-    try:
-        speed = int(speed)
-    except ValueError:
-        print("This is not a supported speed , Please try again...")
-        return False
-
     if speed not in [1, 2, 3]:
         print("This is not a supported speed , Please try again...")
         return False
@@ -65,26 +59,23 @@ def check_for_errors(ip_range, speed):
     if len(ip_range) > 18 or len(ip_range) < 9:
         print("More characters typed than expected , Please try again ....\n")
         return False
-    elif '-' and '/' in ip_range:
+    elif '-' and '/' not in ip_range:
         print("Not supported , Please try again ....")
         return False
 
     # Determine which method is being used .
     if '-' in ip_range:
         method = '2'
+        end_address = get_prefix_or_end_address(ip_range, method)
     elif '/' in ip_range:
         method = '1'
+        prefix = get_prefix_or_end_address(ip_range, method)
     else:
         print("No supported method identified , Please try again ....")
         return False
 
     # Exporting the 4 octets as integers in a list.
     octets = get_octets(ip_range, method)
-
-    if method == '1':
-        prefix = get_prefix_or_end_address(ip_range, method)
-    else:
-        end_address = get_prefix_or_end_address(ip_range, method)
 
     for j in range(4):
         if octets[j] > 255 or octets[j] < 0:
@@ -104,18 +95,6 @@ def check_for_errors(ip_range, speed):
             return False
 
     return method, octets, prefix, end_address
-
-
-def init_process():
-    print("\n\n[PING SCAN]\n\n")
-
-    ip_range = input(
-        "Type the IPv4 address range that you wish to scan following these two methods : ( 192.168.1.0/24 )   "
-        "or   ( 192.168.1.0-255 )    : ")
-
-    speed = input("Choose speed ( 1 , 2 , 3 ): ")
-
-    return noSpaceString(ip_range), speed
 
 
 # This function is what actually finds if a host is active or not with the ping command
@@ -165,7 +144,7 @@ def bubble_sort(active_ips):
 
     for ip in active_ips:
         last_dot_index = ip.rindex('.')
-        oct4 = temp_string[last_dot_index + 1: len(temp_string)]
+        oct4 = ip[last_dot_index + 1: len(ip)]
         last_octets.append(int(oct4))
 
     for i in range(len(active_ips)):
@@ -184,12 +163,15 @@ method = ip_range = ''
 octets = active_ips = []
 speed = 0
 
-ip_range, speed = init_process()
+print("\n\n[PING SCAN]\n\n")
+ip_range = noSpaceString(input("Type the IPv4 address range that you wish to scan following these two methods \n( 192.168.1.0/24  or   ( 192.168.1.0-255 )    : "))
+speed = int(input("Choose speed ( 1 , 2 , 3 ): "))
+
 while not check_for_errors(ip_range, speed):
-    ip_range, speed = init_process()
+    ip_range = noSpaceString(input("Type the IPv4 address range that you wish to scan following these two methods \n( 192.168.1.0/24  or   ( 192.168.1.0-255 )    : "))
+    speed = int(input("Choose speed ( 1 , 2 , 3 ): "))
 
 method, octets, prefix, end_address = check_for_errors(ip_range, speed)
-
 start_time = time.time()
 
 if method == '1':
@@ -206,8 +188,6 @@ elif method == '2':
         count = 1
 else:
     count = 0
-
-print("Scanning ", count, "host(s).\n")
 
 if int(speed) == 1:
     if count < 8:
@@ -235,6 +215,8 @@ start = octets[3]
 finish = start + increment
 totalThreads = 0;
 
+print("Scanning ", count, "host(s).\n")
+
 if int(speed) == 1:
     if count < 8:
         startThreads(count, start, finish)
@@ -254,6 +236,7 @@ else:
 print("\n\n\n\n[ACTIVE HOSTS]\n")
 
 active_ips = bubble_sort(active_ips)
+
 
 for ip in active_ips:
     print(ip)
