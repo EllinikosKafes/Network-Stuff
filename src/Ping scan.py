@@ -1,11 +1,6 @@
-# The following script is a ping scan that allows us to detect "alive" devices or hosts in our network.
-# Currently it only supports for a scan of max 256 hosts (/24 or 0-255) for ease and faster execution time (Warning : it's slow).
-# It is currently supported only for Windows , some modifications have to happen to be supported in other OS.
-
 import subprocess, threading, time
 
 
-# This function takes the initial string (input) and discards all the spaces , so we can make our job easier and more predictable!
 def noSpaceString(ip_range):
     renewed_range = []
     
@@ -35,10 +30,6 @@ def get_indexes(ip_range, method):
     return index_list[0], index_list[1], index_list[2], index_list[3]
 
 
-# In this function, we export the octets one by one as strings, we insert them in a list (octets) and after we
-# convert all the values into integers we return it. I used several string methods to isolate the octets from the
-# dots '.' and slash '/' or dash '-' (depending on the method that the user chooses). I also used the get_indexes (
-# ip_range) function, which aims to give me the indexes of the dots, so that I can "find" the digits between the dots.
 def get_octets(ip_range, method):
     octets = []
     ind1, ind2, ind3, index_of_slash_or_dash = get_indexes(ip_range, method)
@@ -53,8 +44,6 @@ def get_octets(ip_range, method):
     return octets
 
 
-# In this function , we get the prefix length (e.g. /24) or the end address , which is the last octet that the user
-# has put (e.g. -245) , depending on the method.
 def get_prefix_or_end_address(ip_string, method):
     length = len(ip_string)
     
@@ -66,16 +55,11 @@ def get_prefix_or_end_address(ip_string, method):
     return int(ip_string[x + 1: length])
 
 
-# This is the function that checks for user input errors. We check if he has put an invalid character, if he did not
-# put a prefix length, if his octets exceed the allowed limits, if the prefix length entered is greater than 32 or
-# less than 24 and if the general character population is more or less than we expect. For now, I have not programmed
-# it to support prefixes less than 24 for reasons of simplicity and convenience (because we need to check and process
-# only the last octet).
+# This function checks for input errors, it only checks for invalid characters, missing prefix length, allowed limits, prefix length limits
 def check_for_errors(ip_range, speed):
     valid_values = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '/', '.', '-']
     prefix = -1
     end_address = -1
-
 
     try:
         speed = int(speed)
@@ -86,7 +70,6 @@ def check_for_errors(ip_range, speed):
     if speed != 1 and speed != 2 and speed != 3:
         print("This is not a supported speed , Please try again...")
         return False
-
 
     for j in range(len(ip_range)):
         if ip_range[j] not in valid_values:
@@ -152,11 +135,7 @@ def init_process():
     return ip_range, speed
 
 
-# This the fuction that we ping from our system (Only for Windows). After the ping, we check the returncode and its
-# message to find out what the result was . Returncode 0 means that a command was executed successfully, but for some
-# reason in Windows the messages "Destination host unreachable", "Destination net unreachable" and a successful echo
-# reply, have all returncode 0 (unlike linux). For this reason , I also checked their output(stdout). The addresses
-# that responded successfully to the pings are listed in the active_ips list.
+# This function is what actually finds if a host is active or not with the ping command
 def scanning_process(first_address, last_address ):
     global active_ips
 
@@ -183,13 +162,10 @@ def scanning_process(first_address, last_address ):
             print("Ping to " + address, "failed!")
 
 
-# Function to sort the list of active hosts from the active_ips list.
-# Some processes end faster than their predecessors, so we need to sort the list. This function is optional.
+# Sort the active hosts in ascending order
 def bubble_sort(active_ips):
     last_octets = []
-    # In this loop we append every last octet of the active IPv4 adresses in the last_octets list.
-    # I did this in order to compare the active IPv4 addresses by using their last octets (that are simple integers).
-    # So in this case , we will have 2 parallel lists , one with the last octet of the IPv4 address(integer) and one with the actual IPv4 address(string).
+
     for ip in active_ips:
         temp_string = ip
         last_dot_index = temp_string.rindex('.')
