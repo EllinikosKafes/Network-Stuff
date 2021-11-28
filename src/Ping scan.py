@@ -137,7 +137,7 @@ def scanning_process(first_address, last_address):
 
         # Check active hosts with the ping command
         address = str(octets[0]) + "." + str(octets[1]) + "." + str(octets[2]) + "." + str(j)
-        res = subprocess.run(["ping", address, "-n", '3', ], capture_output=True, text=True)
+        res = subprocess.run(["ping", address, "-n", '3', ], capture_output=True, text=True , shell=True)
 
         if res.returncode == 0 and (res.stdout.count("Destination host unreachable")) > 1:
             print(address, "is unreachable!")
