@@ -20,15 +20,15 @@ def determine_gatewayipandmac():
 
 
 def scanning_spoofed_mac(gateway_ip, gateway_mac):
-    res3 = subprocess.run(["arp", "-a"], capture_output=True, text=True, shell=True)
-    search_for_duplicates = re.findall(f".*{gateway_mac}", res3.stdout)
+    arp_a = subprocess.run(["arp", "-a"], capture_output=True, text=True, shell=True)
+    search_for_duplicates = re.findall(f".*{gateway_mac}", arp_a.stdout)
     attacker = ""
 
     # If we find more than one ARP entry , it means that someone is "pretending" to be the gateway/router .
     if len(search_for_duplicates) > 1:
         for i in range(len(search_for_duplicates)):
-            x2 = re.search("([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})", search_for_duplicates[i])
-            temp_ip = search_for_duplicates[i][x2.span()[0]: x2.span()[1]]
+            ips_search = re.search("([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})", search_for_duplicates[i])
+            temp_ip = search_for_duplicates[i][ips_search.span()[0]: ips_search.span()[1]]
             
             if temp_ip != gateway_ip:
                 attacker = temp_ip
