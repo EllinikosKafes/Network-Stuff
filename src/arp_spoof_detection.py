@@ -44,19 +44,18 @@ reply = scapy.ARP(op=2, pdst=gateway_ip, psrc="192.168.1.30", hwdst=scapy.getmac
 
 while True:
     try:
-        print(f"IP of gateway is : {gateway_ip} \nMAC of gateway is : {gateway_mac}")
         gateway_ip, gateway_mac = determine_gatewayipandmac()
         attacker, spoofingCheck = scanning_spoofed_mac(gateway_ip, gateway_mac)
 
         if spoofingCheck:
             scapy.send(reply, verbose = False)
-
+            print(f"IP of gateway is : {gateway_ip} \nMAC of gateway is : {gateway_mac}")
             print(f"Warning ! {attacker} is spoofing his MAC to the default gateway !\nStarting ARP spoof prevention....")
-            print("Gateway's TRUE MAC : ", scapy.sr1(request, verbose = False).getfieldval('hwsrc'))
+            print("Gateway's TRUE MAC is : ", scapy.sr1(request, verbose = False).getfieldval('hwsrc'))
         else:
             print("All good !")
 
-        sleep(5)
+        sleep(2)
 
     except KeyboardInterrupt:
         print("Stopping the checks.....")
