@@ -21,9 +21,9 @@ Ping scan is a tool that searches all available hosts in a given network and pri
 
 ## arp_spoof
 
-Arp spoof is a simple python script that allows you to 'trick' the victim into thinking that you are the router , giving him (the victim) your own MAC and also 'tricking' the router into thinking that you are in fact the victim. 
+Arp spoof is a simple python script that allows you to 'trick' the victim into thinking that you are the router , giving him (the victim) your own MAC and also 'tricking' the router into thinking that you are in fact the victim . 
 This attack is also known as MITM (man-in-the-middle) attack , because we place ourselves in the middle of a communication.
-Although this tool is not harmful overall , please do not use it to spy or steal data from other users .
+Although this tool is not harmful overall , please do not use it to spy or steal data from other hosts .
 
 <br>
 
@@ -41,7 +41,7 @@ Although this tool is not harmful overall , please do not use it to spy or steal
 ## arp_spoof_detection
 
 Arp spoof detection detects (obviously) if you are being given a false Gateway MAC address , by checking your ARP table . If you are in fact being attacked by arp_spoofing , the script will try to give the gateway/router your valid credentials (your ip and mac address) 
-with a makeshift ARP reply and also request from your gateway/router its corect MAC address with a makeshift ARP request .
+with a makeshift ARP reply and also request its correct MAC address with a makeshift ARP request .
 
 <br>
 
